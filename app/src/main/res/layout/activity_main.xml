@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.hr.nipuream.luckpan.MainActivity"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none"
+    android:background="#7CD8E3"
+    >
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+
+    <!--<com.hr.nipuream.luckpan.view.EnvironmentLayout-->
+        <!--android:id="@+id/evironmentLayout"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--/>-->
+
+
+
+    <!--<ImageView-->
+        <!--android:id="@+id/imageview"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:src="@mipmap/ic_launcher"-->
+        <!--android:layout_centerInParent="true"-->
+        <!--/>-->
+
+
+    <!--<ImageView-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:src="@mipmap/background"-->
+        <!--android:scaleType="fitXY"-->
+        <!--/>-->
+
+    <ImageView
+        android:id="@+id/shan"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/shan"
+        android:scaleType="fitXY"
+        android:layout_alignParentBottom="true"
+        />
+
+    <ImageView
+        android:id="@+id/yun"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/yun"
+        android:scaleType="fitXY"
+        />
+
+    <com.hr.nipuream.luckpan.view.LuckPanLayout
+        android:id="@+id/luckpan_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        />
+
+    <com.hr.nipuream.luckpan.view.RotatePan
+        android:id="@+id/rotatePan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="78dp"
+        android:layout_centerHorizontal="true"
+        />
+
+    <!--<Button-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="旋转"-->
+        <!--android:onClick="rotation"-->
+        <!--/>-->
+
+    <ImageView
+        android:id="@+id/go"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/node"
+        android:clickable="true"
+        android:onClick="rotation"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        />
+
+
+    <RelativeLayout
+        android:id="@+id/hit_user"
+        android:layout_below="@+id/luckpan_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        >
+
+        <TextView
+            android:id="@+id/hit_user_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/text_background"
+            android:text="2016-08-18 14:30:30 马蓉 iPhone6s puls  2016-08-14 15:41:28 王宝强 macbook 2016-08-18 16:22:45 宋吉吉 魅族手机"
+            android:padding="10dp"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="10dp"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            >
+            <requestFocus/>
+            </TextView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="中奖名单"
+            android:textColor="#ffffff"
+            android:background="@drawable/hit_backgroud"
+            android:padding="3dp"
+            android:layout_alignTop="@+id/hit_user_tv"
+            android:layout_centerVertical="true"
+            />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/game_rule"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:layout_below="@+id/hit_user"
+        >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/text_background"
+            android:orientation="vertical"
+            android:layout_marginLeft="10dp"
+            >
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="30dp"/>
+
+            <TextView
+                android:layout_below="@+id/huodong_rule"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="1.点击页面抢购按钮，进入抽奖流程，按提示操作即可(参与本活动无需支付任何费用)。\n2.本次活动萝莉“范儿”\御姐“范儿”\宅男“奢侈”各产生一名中奖者(每个0元抢购产品没人只可参与一次)。\n3.活动期间，每个手机号，获得的“劵号”后7位数字作为本次活动的“抽奖号”。"
+                android:padding="10dp"
+                />
+
+
+        </LinearLayout>
+
+
+        <TextView
+            android:id="@+id/huodong_rule"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="活动规则"
+            android:background="@drawable/rule_background"
+            android:padding="5dp"
+            android:textColor="#ffffff"
+            android:layout_marginTop="5dp"
+            />
+
+    </RelativeLayout>
+    
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_below="@+id/game_rule"
+        android:layout_marginBottom="80dp"
+        />
+    
+
+
+</RelativeLayout>
+</ScrollView>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item type="id" name="shan_id"/>
+    <item type="id" name="yun_id"/>
+    <item type="id" name="node_id" />
+    <item type="id" name="rotate_pan"/>
+
+</resources>
