@@ -10,15 +10,18 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.support.v4.view.GestureDetectorCompat;
+import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
-
 import com.hr.nipuream.luckpan.R;
 import com.hr.nipuream.luckpan.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,10 +38,10 @@ public class RotatePan extends View {
     private Paint dPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint sPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private float lastX = 0,lastY = 0;
     private int InitAngle = 30;
     private int radius = 0;
 
+    public static final int FLING_VELOCITY_DOWNSCALE = 4;
 
     private int[] images = new int[]{R.mipmap.huawei,R.mipmap.image_one,R.mipmap.iphone,R.mipmap.macbook,R.mipmap.meizu,R.mipmap.xiaomi};
 
@@ -46,7 +49,9 @@ public class RotatePan extends View {
 
     private List<Bitmap> bitmaps = new ArrayList<>();
 
-//    private GestureDetectorCompat mDetector;
+    private GestureDetectorCompat mDetector;
+    protected ScrollerCompat scroller;
+
 
     public RotatePan(Context context) {
         this(context,null);
@@ -59,6 +64,9 @@ public class RotatePan extends View {
     public RotatePan(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
+
+        mDetector = new GestureDetectorCompat(context,new RotatePanGestureListener());
+        scroller = ScrollerCompat.create(context);
 
         dPaint.setColor(Color.rgb(255,133,132));
         sPaint.setColor(Color.rgb(254,104,105));
@@ -148,9 +156,9 @@ public class RotatePan extends View {
         Path path = new Path();
         path.addArc(mRange, startAngle, 60);
         float textWidth = mTextPaint.measureText(string);
-        // 利用水平偏移让文字居中
-        float hOffset = (float) (mRadius * Math.PI / 6 / 2 - textWidth / 2);// 水平偏移
-        float vOffset = mRadius / 2 / 4;// 垂直偏移
+
+        float hOffset = (float) (mRadius * Math.PI / 6 / 2 - textWidth / 2);
+        float vOffset = mRadius / 2 / 4;
         mCanvas.drawTextOnPath(string, path, hOffset, vOffset, mTextPaint);
     }
 
@@ -158,7 +166,6 @@ public class RotatePan extends View {
 
     private void drawIcon(int xx,int yy,int mRadius,float startAngle, int i,Canvas mCanvas)
     {
-
         int imgWidth = mRadius / 4;
 
 //        float angle = (float) ((60 + startAngle) * (Math.PI / 180));
@@ -174,24 +181,27 @@ public class RotatePan extends View {
 //        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), images[i]);
         Bitmap bitmap = bitmaps.get(i);
 
+
         Matrix matrix = new Matrix();
         matrix.postRotate(startAngle+180);
 
         Bitmap bm = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
                 bitmap.getHeight(), matrix, true);
+
 //        bitmap.recycle();
 
-        mCanvas.drawBitmap(bm, null, rect, null);
+        if(!bm.isRecycled())
+            mCanvas.drawBitmap(bm, null, rect, null);
     }
 
 
-    public void setImages(List<Bitmap> bitmaps){
-        this.bitmaps = bitmaps;
-        this.invalidate();
-    }
+//    public void setImages(List<Bitmap> bitmaps){
+//        this.bitmaps = bitmaps;
+//        this.invalidate();
+//    }
 
     public void setStr(String... strs){
-       this.strs = strs;
+        this.strs = strs;
         this.invalidate();
     }
 
@@ -244,7 +254,7 @@ public class RotatePan extends View {
         public void onAnimationEnd(Animation animation) {
             int pos = startDegree % 360 / 60;
 
-            if(pos >= 0 && pos < 3){
+            if(pos >= 0 && pos <= 3){
                 pos = 3 - pos;
             }else{
                 pos = (6-pos) + 3;
@@ -262,7 +272,7 @@ public class RotatePan extends View {
     private AnimationEndListener l;
 
     public void setAnimationEndListener(AnimationEndListener l){
-         this.l = l;
+        this.l = l;
     }
 
 
@@ -272,5 +282,96 @@ public class RotatePan extends View {
         if(rotateAnimation != null)
             rotateAnimation.cancel();
     }
+
+
+//    @Override
+//    public boolean onTouchEvent(MotionEvent event) {
+//
+//        boolean consume = mDetector.onTouchEvent(event);
+//        if(consume)
+//        {
+//            getParent().requestDisallowInterceptTouchEvent(true);
+//            return true;
+//        }
+//
+//        return super.onTouchEvent(event);
+//    }
+
+
+    public void setRotate(int rotation){
+        rotation = (rotation % 360 + 360) % 360;
+        InitAngle = rotation;
+        ViewCompat.postInvalidateOnAnimation(this);
+    }
+
+
+    @Override
+    public void computeScroll() {
+
+        if(scroller.computeScrollOffset()){
+            setRotate(scroller.getCurrY());
+        }
+
+        super.computeScroll();
+    }
+
+    private class RotatePanGestureListener extends GestureDetector.SimpleOnGestureListener{
+
+        @Override
+        public boolean onDown(MotionEvent e) {
+            return super.onDown(e);
+        }
+
+        @Override
+        public boolean onDoubleTap(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            float centerX = (RotatePan.this.getLeft() + RotatePan.this.getRight())*0.5f;
+            float centerY = (RotatePan.this.getTop() + RotatePan.this.getBottom())*0.5f;
+
+
+            float scrollTheta = vectorToScalarScroll(distanceX, distanceY, e2.getX() - centerX, e2.getY() -
+                    centerY);
+            int rotate = InitAngle -
+                    (int) scrollTheta / FLING_VELOCITY_DOWNSCALE;
+
+            setRotate(rotate);
+            return true;
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            float centerX = (RotatePan.this.getLeft() + RotatePan.this.getRight())*0.5f;
+            float centerY = (RotatePan.this.getTop() + RotatePan.this.getBottom())*0.5f;
+
+            float scrollTheta = vectorToScalarScroll(velocityX, velocityY, e2.getX() - centerX, e2.getY() -
+                    centerY);
+            scroller.abortAnimation();
+            scroller.fling(0, InitAngle , 0, (int) scrollTheta / FLING_VELOCITY_DOWNSCALE,
+                    0, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+            return true;
+        }
+
+    }
+
+    private float vectorToScalarScroll(float dx, float dy, float x, float y) {
+        // get the length of the vector
+        float l = (float) Math.sqrt(dx * dx + dy * dy);
+
+        // decide if the scalar should be negative or positive by finding
+        // the dot product of the vector perpendicular to (x,y).
+        float crossX = -y;
+        float crossY = x;
+
+        float dot = (crossX * dx + crossY * dy);
+        float sign = Math.signum(dot);
+
+        return l * sign;
+    }
+
+
 
 }
