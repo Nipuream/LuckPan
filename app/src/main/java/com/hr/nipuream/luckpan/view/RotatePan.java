@@ -8,20 +8,22 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.RotateAnimation;
+
 import com.hr.nipuream.luckpan.R;
 import com.hr.nipuream.luckpan.Util;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -44,13 +46,13 @@ public class RotatePan extends View {
     public static final int FLING_VELOCITY_DOWNSCALE = 4;
 
     private int[] images = new int[]{R.mipmap.huawei,R.mipmap.image_one,R.mipmap.iphone,R.mipmap.macbook,R.mipmap.meizu,R.mipmap.xiaomi};
-
     private String[] strs = {"华为手机","谢谢惠顾","iPhone 6s","mac book","魅族手机","小米手机"};
-
     private List<Bitmap> bitmaps = new ArrayList<>();
-
     private GestureDetectorCompat mDetector;
-    protected ScrollerCompat scroller;
+    private ScrollerCompat scroller;
+//    private SurfaceHolder mHolder;
+//  private RendererThread rendererThread;
+
 
 
     public RotatePan(Context context) {
@@ -74,7 +76,7 @@ public class RotatePan extends View {
         textPaint.setTextSize(Util.dip2px(context,16));
         setClickable(true);
 
-        for(int i=0 ;i<6;i++){
+        for(int i=0;i<6;i++){
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), images[i]);
             bitmaps.add(bitmap);
         }
@@ -125,16 +127,13 @@ public class RotatePan extends View {
         int angle = InitAngle - 30;
 
         for(int i= 0;i<6;i++){
-
             if(i%2 == 0){
                 canvas.drawArc(rectF,angle,60,true,dPaint);
             }else
             {
                 canvas.drawArc(rectF,angle,60,true,sPaint);
             }
-
             angle += 60;
-
         }
 
         for(int i=0;i<6;i++){
@@ -149,10 +148,8 @@ public class RotatePan extends View {
 
     }
 
-
     private void drawText(float startAngle, String string,int mRadius,Paint mTextPaint,Canvas mCanvas,RectF mRange)
     {
-
         Path path = new Path();
         path.addArc(mRange, startAngle, 60);
         float textWidth = mTextPaint.measureText(string);
@@ -162,43 +159,34 @@ public class RotatePan extends View {
         mCanvas.drawTextOnPath(string, path, hOffset, vOffset, mTextPaint);
     }
 
-
-
     private void drawIcon(int xx,int yy,int mRadius,float startAngle, int i,Canvas mCanvas)
     {
         int imgWidth = mRadius / 4;
 
-//        float angle = (float) ((60 + startAngle) * (Math.PI / 180));
-        float angle = (float) Util.change(60+startAngle);
+        float angle = (float) Math.toRadians(60 +startAngle);
 
-        int x = (int) (xx + mRadius / 2 * Math.cos(angle));
-        int y = (int) (yy + mRadius / 2  * Math.sin(angle));
+        float x = (float) (xx + mRadius / 2 * Math.cos(angle));
+        float y = (float) (yy + mRadius / 2  * Math.sin(angle));
 
         // 确定绘制图片的位置
-        Rect rect = new Rect(x - imgWidth *3/ 4, y - imgWidth*3 / 4, x + imgWidth
+        RectF rect = new RectF(x - imgWidth *3/ 4, y - imgWidth*3 / 4, x + imgWidth
                 *3/ 4, y + imgWidth*3/4);
 
-//        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), images[i]);
         Bitmap bitmap = bitmaps.get(i);
-
 
         Matrix matrix = new Matrix();
         matrix.postRotate(startAngle+180);
-
         Bitmap bm = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
                 bitmap.getHeight(), matrix, true);
 
-//        bitmap.recycle();
-
-        if(!bm.isRecycled())
-            mCanvas.drawBitmap(bm, null, rect, null);
+        mCanvas.drawBitmap(bm, null, rect, null);
     }
 
 
-//    public void setImages(List<Bitmap> bitmaps){
-//        this.bitmaps = bitmaps;
-//        this.invalidate();
-//    }
+    public void setImages(List<Bitmap> bitmaps){
+        this.bitmaps = bitmaps;
+        this.invalidate();
+    }
 
     public void setStr(String... strs){
         this.strs = strs;
@@ -210,25 +198,29 @@ public class RotatePan extends View {
     //角度
     private int[] anglesSource = { 0, 60, 120, 180, 240, 300 };
 
-    private int startDegree = 0;
+//    private int startDegree = 0;
 
     //旋转一圈所需要的时间
     private static final long ONE_WHEEL_TIME = 500;
+
+    private int startRotate = 0;
 
     //旋转动画
     private RotateAnimation rotateAnimation;
 
 
     public void startRotate(){
+
         int lap = lapsSource[(int) (Math.random() * 4)];
         int angle = anglesSource[(int) (Math.random() * 6)];
 
         int increaseDegree = lap * 360 + angle;
         rotateAnimation = new RotateAnimation(
-                startDegree, startDegree + increaseDegree,
+                startRotate, increaseDegree+startRotate,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f,
                 RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-        startDegree += increaseDegree;
+
+        startRotate += increaseDegree;
         long time = (lap + angle / 360) * ONE_WHEEL_TIME;
 
         rotateAnimation.setDuration(time);
@@ -236,13 +228,14 @@ public class RotatePan extends View {
         rotateAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
         rotateAnimation.setAnimationListener(al);
         startAnimation(rotateAnimation);
+
     }
 
     private Animation.AnimationListener al = new Animation.AnimationListener() {
 
         @Override
         public void onAnimationStart(Animation animation) {
-            // TODO Auto-generated method stub
+            // TODO Auto-generated method stub]
         }
 
         @Override
@@ -252,7 +245,8 @@ public class RotatePan extends View {
 
         @Override
         public void onAnimationEnd(Animation animation) {
-            int pos = startDegree % 360 / 60;
+
+            int pos = startRotate % 360 / 60;
 
             if(pos >= 0 && pos <= 3){
                 pos = 3 - pos;
@@ -262,8 +256,11 @@ public class RotatePan extends View {
 
             if(l != null)
                 l.endAnimation(pos);
+
         }
+
     };
+
 
     public interface AnimationEndListener{
         void endAnimation(int position);
@@ -283,6 +280,10 @@ public class RotatePan extends View {
             rotateAnimation.cancel();
     }
 
+
+
+
+    // todo ==================================== 手势处理 ===============================================================
 
 //    @Override
 //    public boolean onTouchEvent(MotionEvent event) {
@@ -332,7 +333,6 @@ public class RotatePan extends View {
             float centerX = (RotatePan.this.getLeft() + RotatePan.this.getRight())*0.5f;
             float centerY = (RotatePan.this.getTop() + RotatePan.this.getBottom())*0.5f;
 
-
             float scrollTheta = vectorToScalarScroll(distanceX, distanceY, e2.getX() - centerX, e2.getY() -
                     centerY);
             int rotate = InitAngle -
@@ -349,6 +349,10 @@ public class RotatePan extends View {
 
             float scrollTheta = vectorToScalarScroll(velocityX, velocityY, e2.getX() - centerX, e2.getY() -
                     centerY);
+
+            Log.d("scrollTheta",scrollTheta+"");
+            Log.d("value",(int) scrollTheta / FLING_VELOCITY_DOWNSCALE+"");
+
             scroller.abortAnimation();
             scroller.fling(0, InitAngle , 0, (int) scrollTheta / FLING_VELOCITY_DOWNSCALE,
                     0, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
