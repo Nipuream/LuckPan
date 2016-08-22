@@ -1,11 +1,13 @@
 package com.hr.nipuream.luckpan.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.RectF;
@@ -13,13 +15,10 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
 
 import com.hr.nipuream.luckpan.R;
 import com.hr.nipuream.luckpan.Util;
@@ -50,10 +49,6 @@ public class RotatePan extends View {
     private List<Bitmap> bitmaps = new ArrayList<>();
     private GestureDetectorCompat mDetector;
     private ScrollerCompat scroller;
-//    private SurfaceHolder mHolder;
-//  private RendererThread rendererThread;
-
-
 
     public RotatePan(Context context) {
         this(context,null);
@@ -82,7 +77,6 @@ public class RotatePan extends View {
         }
     }
 
-
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // TODO Auto-generated method stub
@@ -104,7 +98,6 @@ public class RotatePan extends View {
             setMeasuredDimension(widthSpecSize, mHeight);
         }
     }
-
 
     @Override
     protected void onDraw(Canvas canvas) {
@@ -145,7 +138,6 @@ public class RotatePan extends View {
             drawText(InitAngle+30,strs[i], 2*radius, textPaint, canvas,rectF);
             InitAngle += 60;
         }
-
     }
 
     private void drawText(float startAngle, String string,int mRadius,Paint mTextPaint,Canvas mCanvas,RectF mRange)
@@ -161,6 +153,7 @@ public class RotatePan extends View {
 
     private void drawIcon(int xx,int yy,int mRadius,float startAngle, int i,Canvas mCanvas)
     {
+
         int imgWidth = mRadius / 4;
 
         float angle = (float) Math.toRadians(60 +startAngle);
@@ -174,12 +167,7 @@ public class RotatePan extends View {
 
         Bitmap bitmap = bitmaps.get(i);
 
-        Matrix matrix = new Matrix();
-        matrix.postRotate(startAngle+180);
-        Bitmap bm = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(),
-                bitmap.getHeight(), matrix, true);
-
-        mCanvas.drawBitmap(bm, null, rect, null);
+        mCanvas.drawBitmap(bitmap, null, rect, null);
     }
 
 
@@ -193,73 +181,56 @@ public class RotatePan extends View {
         this.invalidate();
     }
 
-    //圈数
-    private int[] lapsSource = { 5, 7, 9, 15 };
-    //角度
-    private int[] anglesSource = { 0, 60, 120, 180, 240, 300 };
-
-//    private int startDegree = 0;
-
     //旋转一圈所需要的时间
     private static final long ONE_WHEEL_TIME = 500;
 
-    private int startRotate = 0;
-
-    //旋转动画
-    private RotateAnimation rotateAnimation;
-
-
     public void startRotate(){
 
-        int lap = lapsSource[(int) (Math.random() * 4)];
-        int angle = anglesSource[(int) (Math.random() * 6)];
+        int lap = (int) (Math.random()*12)+4;
+        int angle = (int) (Math.random() * 360);
 
         int increaseDegree = lap * 360 + angle;
-        rotateAnimation = new RotateAnimation(
-                startRotate, increaseDegree+startRotate,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f,
-                RotateAnimation.RELATIVE_TO_SELF, 0.5f);
-
-        startRotate += increaseDegree;
         long time = (lap + angle / 360) * ONE_WHEEL_TIME;
 
-        rotateAnimation.setDuration(time);
-        rotateAnimation.setFillAfter(true);
-        rotateAnimation.setInterpolator(new AccelerateDecelerateInterpolator());
-        rotateAnimation.setAnimationListener(al);
-        startAnimation(rotateAnimation);
+        int DesRotate = increaseDegree + InitAngle;
 
+        //TODO 为了每次都能旋转到转盘的中间位置
+        int offRotate = DesRotate % 360 % 60;
+        DesRotate -= offRotate;
+        DesRotate += 30;
+
+
+        ValueAnimator animtor = ValueAnimator.ofInt(InitAngle,DesRotate);
+        animtor.setInterpolator(new AccelerateDecelerateInterpolator());
+        animtor.setDuration(time);
+        animtor.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int updateValue = (int) animation.getAnimatedValue();
+                InitAngle = (updateValue % 360 + 360) % 360;
+                ViewCompat.postInvalidateOnAnimation(RotatePan.this);
+            }
+        });
+        animtor.addListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                int pos = InitAngle / 60;
+
+                if(pos >= 0 && pos <= 3){
+                    pos = 3 - pos;
+                }else{
+                    pos = (6-pos) + 3;
+                }
+
+                if(l != null)
+                    l.endAnimation(pos);
+            }
+        });
+        animtor.start();
     }
 
-    private Animation.AnimationListener al = new Animation.AnimationListener() {
-
-        @Override
-        public void onAnimationStart(Animation animation) {
-            // TODO Auto-generated method stub]
-        }
-
-        @Override
-        public void onAnimationRepeat(Animation animation) {
-            // TODO Auto-generated method stub
-        }
-
-        @Override
-        public void onAnimationEnd(Animation animation) {
-
-            int pos = startRotate % 360 / 60;
-
-            if(pos >= 0 && pos <= 3){
-                pos = 3 - pos;
-            }else{
-                pos = (6-pos) + 3;
-            }
-
-            if(l != null)
-                l.endAnimation(pos);
-
-        }
-
-    };
 
 
     public interface AnimationEndListener{
@@ -276,27 +247,24 @@ public class RotatePan extends View {
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        if(rotateAnimation != null)
-            rotateAnimation.cancel();
+        clearAnimation();
     }
 
 
+    // TODO ==================================== 手势处理 ===============================================================
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
 
-    // todo ==================================== 手势处理 ===============================================================
+        boolean consume = mDetector.onTouchEvent(event);
+        if(consume)
+        {
+            getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+        }
 
-//    @Override
-//    public boolean onTouchEvent(MotionEvent event) {
-//
-//        boolean consume = mDetector.onTouchEvent(event);
-//        if(consume)
-//        {
-//            getParent().requestDisallowInterceptTouchEvent(true);
-//            return true;
-//        }
-//
-//        return super.onTouchEvent(event);
-//    }
+        return super.onTouchEvent(event);
+    }
 
 
     public void setRotate(int rotation){
@@ -350,23 +318,18 @@ public class RotatePan extends View {
             float scrollTheta = vectorToScalarScroll(velocityX, velocityY, e2.getX() - centerX, e2.getY() -
                     centerY);
 
-            Log.d("scrollTheta",scrollTheta+"");
-            Log.d("value",(int) scrollTheta / FLING_VELOCITY_DOWNSCALE+"");
-
             scroller.abortAnimation();
             scroller.fling(0, InitAngle , 0, (int) scrollTheta / FLING_VELOCITY_DOWNSCALE,
                     0, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
             return true;
         }
-
     }
 
+    //TODO 判断滑动的方向
     private float vectorToScalarScroll(float dx, float dy, float x, float y) {
-        // get the length of the vector
+
         float l = (float) Math.sqrt(dx * dx + dy * dy);
 
-        // decide if the scalar should be negative or positive by finding
-        // the dot product of the vector perpendicular to (x,y).
         float crossX = -y;
         float crossY = x;
 

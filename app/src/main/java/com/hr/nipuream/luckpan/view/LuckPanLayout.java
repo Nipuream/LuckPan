@@ -58,7 +58,6 @@ public class LuckPanLayout extends View {
         }else if(heightSpecMode == MeasureSpec.AT_MOST){
             setMeasuredDimension(widthSpecSize, 200);
         }
-
     }
 
 
