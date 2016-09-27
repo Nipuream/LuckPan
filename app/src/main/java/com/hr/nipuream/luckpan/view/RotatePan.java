@@ -19,10 +19,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-
 import com.hr.nipuream.luckpan.R;
 import com.hr.nipuream.luckpan.Util;
-
 import java.util.ArrayList;
 import java.util.List;
 
