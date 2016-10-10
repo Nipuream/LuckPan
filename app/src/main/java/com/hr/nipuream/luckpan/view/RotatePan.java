@@ -182,21 +182,40 @@ public class RotatePan extends View {
     //旋转一圈所需要的时间
     private static final long ONE_WHEEL_TIME = 500;
 
-    public void startRotate(){
 
-        int lap = (int) (Math.random()*12)+4;
-        int angle = (int) (Math.random() * 360);
+    /**
+     * 开始转动
+     * @param pos 如果 pos = -1 则随机，如果指定某个值，则转到某个指定区域
+     */
+    public void startRotate(int pos){
+
+        int lap = (int) (Math.random()*12) + 4;
+
+        int angle = 0;
+        if(pos < 0){
+            angle = (int) (Math.random() * 360);
+        }else{
+            int initPos  = queryPosition();
+            if(pos > initPos){
+                angle = (pos - initPos)*60;
+                lap -= 1;
+                angle = 360 - angle;
+            }else if(pos < initPos){
+                angle = (initPos - pos)*60;
+            }else{
+                //nothing to do.
+            }
+        }
+
 
         int increaseDegree = lap * 360 + angle;
         long time = (lap + angle / 360) * ONE_WHEEL_TIME;
-
         int DesRotate = increaseDegree + InitAngle;
 
         //TODO 为了每次都能旋转到转盘的中间位置
         int offRotate = DesRotate % 360 % 60;
         DesRotate -= offRotate;
         DesRotate += 30;
-
 
         ValueAnimator animtor = ValueAnimator.ofInt(InitAngle,DesRotate);
         animtor.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -209,26 +228,41 @@ public class RotatePan extends View {
                 ViewCompat.postInvalidateOnAnimation(RotatePan.this);
             }
         });
+
         animtor.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
 
-                int pos = InitAngle / 60;
-
-                if(pos >= 0 && pos <= 3){
-                    pos = 3 - pos;
-                }else{
-                    pos = (6-pos) + 3;
-                }
+//                int pos = InitAngle / 60;
+//                if(pos >= 0 && pos <= 3){
+//                    pos = 3 - pos;
+//                }else{
+//                    pos = (6-pos) + 3;
+//                }
 
                 if(l != null)
-                    l.endAnimation(pos);
+                    l.endAnimation(queryPosition());
             }
         });
         animtor.start();
     }
 
+
+    private int queryPosition(){
+        InitAngle = (InitAngle % 360 + 360) % 360;
+        int pos = InitAngle / 60;
+        return calcumAngle(pos);
+    }
+
+    private int calcumAngle(int pos){
+        if(pos >= 0 && pos <= 3){
+            pos = 3 - pos;
+        }else{
+            pos = (6-pos) + 3;
+        }
+        return pos;
+    }
 
 
     public interface AnimationEndListener{

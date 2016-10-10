@@ -68,9 +68,8 @@ public class MainActivity extends AppCompatActivity implements RotatePan.Animati
         });
     }
 
-
     public void rotation(View view){
-        rotatePan.startRotate();
+        rotatePan.startRotate(-1);
         luckPanLayout.setDelayTime(100);
         goBtn.setEnabled(false);
     }

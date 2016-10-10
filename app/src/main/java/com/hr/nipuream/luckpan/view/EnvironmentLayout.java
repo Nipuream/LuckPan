@@ -129,7 +129,7 @@ public class EnvironmentLayout extends RelativeLayout implements View.OnClickLis
 
     public void startLuck(){
         if(rotatePan != null)
-            rotatePan.startRotate();
+            rotatePan.startRotate(-1);
     }
 
 
