@@ -2,6 +2,7 @@
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:luckpan="http://schemas.android.com/apk/res-auto"
     tools:context="com.hr.nipuream.luckpan.MainActivity"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -69,6 +70,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="78dp"
         android:layout_centerHorizontal="true"
+        luckpan:pannum="6"
+        luckpan:names="@array/names"
+        luckpan:icons="@array/icons"
         />
 
     <!--<Button-->

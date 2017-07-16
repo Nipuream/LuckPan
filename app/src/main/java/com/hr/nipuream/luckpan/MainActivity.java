@@ -19,12 +19,13 @@ public class MainActivity extends AppCompatActivity implements RotatePan.Animati
     private ImageView goBtn;
     private ImageView yunIv;
 
-    private String[] strs = {"华为手机","谢谢惠顾","iPhone 6s","mac book","魅族手机","小米手机"};
+    private String[] strs ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        strs = getResources().getStringArray(R.array.names);
         luckPanLayout = (LuckPanLayout) findViewById(R.id.luckpan_layout);
         luckPanLayout.startLuckLight();
         rotatePan = (RotatePan) findViewById(R.id.rotatePan);

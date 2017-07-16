@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -15,6 +16,7 @@ import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.ScrollerCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,6 +24,7 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import com.hr.nipuream.luckpan.R;
 import com.hr.nipuream.luckpan.Util;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -34,16 +37,21 @@ public class RotatePan extends View {
 
     private Context context;
 
+    private int panNum = 0;
+
     private Paint dPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint sPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private int InitAngle = 30;
+    private int InitAngle = 0;
     private int radius = 0;
+    private int verPanRadius ;
+    private int diffRadius ;
 
     public static final int FLING_VELOCITY_DOWNSCALE = 4;
 
-    private int[] images = new int[]{R.mipmap.huawei,R.mipmap.image_one,R.mipmap.iphone,R.mipmap.macbook,R.mipmap.meizu,R.mipmap.xiaomi};
-    private String[] strs = {"华为手机","谢谢惠顾","iPhone 6s","mac book","魅族手机","小米手机"};
+    private Integer[] images ;
+    private String[] strs ;
+
     private List<Bitmap> bitmaps = new ArrayList<>();
     private GestureDetectorCompat mDetector;
     private ScrollerCompat scroller;
@@ -63,16 +71,46 @@ public class RotatePan extends View {
         mDetector = new GestureDetectorCompat(context,new RotatePanGestureListener());
         scroller = ScrollerCompat.create(context);
 
+        checkPanState(context,attrs);
+        InitAngle = 360 / panNum;
+        verPanRadius = 360 / panNum;
+        diffRadius = verPanRadius /2;
         dPaint.setColor(Color.rgb(255,133,132));
         sPaint.setColor(Color.rgb(254,104,105));
         textPaint.setColor(Color.WHITE);
         textPaint.setTextSize(Util.dip2px(context,16));
         setClickable(true);
 
-        for(int i=0;i<6;i++){
+        for(int i=0;i<panNum;i++){
             Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), images[i]);
             bitmaps.add(bitmap);
         }
+    }
+
+    private void checkPanState(Context context,AttributeSet attrs){
+        TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.luckpan);
+        panNum = typedArray.getInteger(R.styleable.luckpan_pannum,0);
+        if(360 % panNum != 0)
+            throw new RuntimeException("can't split pan for all icon.");
+        int nameArray = typedArray.getResourceId(R.styleable.luckpan_names,-1);
+        if(nameArray ==  -1) throw new RuntimeException("Can't find pan name.");
+        strs = context.getResources().getStringArray(nameArray);
+        int iconArray = typedArray.getResourceId(R.styleable.luckpan_icons, -1);
+        if(iconArray == -1) throw  new RuntimeException("Can't find pan icon.");
+
+        String[] iconStrs = context.getResources().getStringArray(iconArray);
+        List<Integer> iconLists =  new ArrayList<>();
+        for(int i=0;i<iconStrs.length;i++){
+            iconLists.add(context.getResources().getIdentifier(iconStrs[i],"mipmap",context.getPackageName()));
+        }
+
+        images = iconLists.toArray(new Integer[iconLists.size()]);
+        Log.d("images", Arrays.toString(images));
+        typedArray.recycle();
+        if(strs == null || images == null)
+            throw new RuntimeException("Can't find string or icon resources.");
+        if(strs.length != panNum || images.length != panNum)
+            throw new RuntimeException("The string length or icon length  isn't equals panNum.");
     }
 
     @Override
@@ -115,33 +153,34 @@ public class RotatePan extends View {
 
         RectF rectF = new RectF(getPaddingLeft(),getPaddingTop(),width,height);
 
-        int angle = InitAngle - 30;
+        int angle = (panNum%4 ==0) ? InitAngle : InitAngle-diffRadius;
+        Log.d("angle",String.valueOf(angle));
 
-        for(int i= 0;i<6;i++){
+        for(int i= 0;i<panNum;i++){
             if(i%2 == 0){
-                canvas.drawArc(rectF,angle,60,true,dPaint);
+                canvas.drawArc(rectF,angle,verPanRadius,true,dPaint);
             }else
             {
-                canvas.drawArc(rectF,angle,60,true,sPaint);
+                canvas.drawArc(rectF,angle,verPanRadius,true,sPaint);
             }
-            angle += 60;
+            angle += verPanRadius;
         }
 
-        for(int i=0;i<6;i++){
-            drawIcon(width/2, height/2, radius, InitAngle, i, canvas);
-            InitAngle += 60;
+        for(int i=0;i<panNum;i++){
+            drawIcon(width/2, height/2, radius, (panNum%4==0)?InitAngle + diffRadius : InitAngle, i, canvas);
+            InitAngle += verPanRadius;
         }
 
-        for(int i=0;i<6;i++){
-            drawText(InitAngle+30,strs[i], 2*radius, textPaint, canvas,rectF);
-            InitAngle += 60;
+        for(int i=0;i<panNum;i++){
+            drawText((panNum%4==0)?InitAngle+diffRadius + (diffRadius/2):InitAngle+diffRadius ,strs[i], 2*radius, textPaint, canvas,rectF);
+            InitAngle += verPanRadius;
         }
     }
 
     private void drawText(float startAngle, String string,int mRadius,Paint mTextPaint,Canvas mCanvas,RectF mRange)
     {
         Path path = new Path();
-        path.addArc(mRange, startAngle, 60);
+        path.addArc(mRange, startAngle, verPanRadius);
         float textWidth = mTextPaint.measureText(string);
 
         float hOffset = (float) (mRadius * Math.PI / 6 / 2 - textWidth / 2);
@@ -154,7 +193,7 @@ public class RotatePan extends View {
 
         int imgWidth = mRadius / 4;
 
-        float angle = (float) Math.toRadians(60 +startAngle);
+        float angle = (float) Math.toRadians(verPanRadius +startAngle);
 
         float x = (float) (xx + mRadius / 2 * Math.cos(angle));
         float y = (float) (yy + mRadius / 2  * Math.sin(angle));
@@ -197,11 +236,11 @@ public class RotatePan extends View {
         }else{
             int initPos  = queryPosition();
             if(pos > initPos){
-                angle = (pos - initPos)*60;
+                angle = (pos - initPos)*verPanRadius;
                 lap -= 1;
                 angle = 360 - angle;
             }else if(pos < initPos){
-                angle = (initPos - pos)*60;
+                angle = (initPos - pos)*verPanRadius;
             }else{
                 //nothing to do.
             }
@@ -213,9 +252,9 @@ public class RotatePan extends View {
         int DesRotate = increaseDegree + InitAngle;
 
         //TODO 为了每次都能旋转到转盘的中间位置
-        int offRotate = DesRotate % 360 % 60;
+        int offRotate = DesRotate % 360 % verPanRadius;
         DesRotate -= offRotate;
-        DesRotate += 30;
+        DesRotate += diffRadius;
 
         ValueAnimator animtor = ValueAnimator.ofInt(InitAngle,DesRotate);
         animtor.setInterpolator(new AccelerateDecelerateInterpolator());
@@ -233,14 +272,6 @@ public class RotatePan extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-
-//                int pos = InitAngle / 60;
-//                if(pos >= 0 && pos <= 3){
-//                    pos = 3 - pos;
-//                }else{
-//                    pos = (6-pos) + 3;
-//                }
-
                 if(l != null)
                     l.endAnimation(queryPosition());
             }
@@ -251,15 +282,15 @@ public class RotatePan extends View {
 
     private int queryPosition(){
         InitAngle = (InitAngle % 360 + 360) % 360;
-        int pos = InitAngle / 60;
+        int pos = InitAngle / verPanRadius;
         return calcumAngle(pos);
     }
 
     private int calcumAngle(int pos){
-        if(pos >= 0 && pos <= 3){
-            pos = 3 - pos;
+        if(pos >= 0 && pos <= panNum/2){
+            pos = panNum/2 - pos;
         }else{
-            pos = (6-pos) + 3;
+            pos = (panNum-pos) + panNum/2;
         }
         return pos;
     }
