@@ -172,7 +172,7 @@ public class RotatePan extends View {
         }
 
         for(int i=0;i<panNum;i++){
-            drawText((panNum%4==0)?InitAngle+diffRadius + (diffRadius/2):InitAngle+diffRadius ,strs[i], 2*radius, textPaint, canvas,rectF);
+            drawText((panNum%4==0)?InitAngle+diffRadius + (diffRadius*3/4):InitAngle+diffRadius ,strs[i], 2*radius, textPaint, canvas,rectF);
             InitAngle += verPanRadius;
         }
     }
@@ -183,8 +183,10 @@ public class RotatePan extends View {
         path.addArc(mRange, startAngle, verPanRadius);
         float textWidth = mTextPaint.measureText(string);
 
+        //圆弧的水平偏移
         float hOffset = (float) (mRadius * Math.PI / 6 / 2 - textWidth / 2);
-        float vOffset = mRadius / 2 / 4;
+        //圆弧的垂直偏移
+        float vOffset = mRadius / 2 / 6;
         mCanvas.drawTextOnPath(string, path, hOffset, vOffset, mTextPaint);
     }
 
@@ -195,12 +197,13 @@ public class RotatePan extends View {
 
         float angle = (float) Math.toRadians(verPanRadius +startAngle);
 
-        float x = (float) (xx + mRadius / 2 * Math.cos(angle));
-        float y = (float) (yy + mRadius / 2  * Math.sin(angle));
+        //确定图片在圆弧中 中心点的位置
+        float x = (float) (xx + (mRadius /2 + mRadius/12)* Math.cos(angle));
+        float y = (float) (yy + (mRadius /2 +mRadius/12) * Math.sin(angle));
 
         // 确定绘制图片的位置
-        RectF rect = new RectF(x - imgWidth *3/ 4, y - imgWidth*3 / 4, x + imgWidth
-                *3/ 4, y + imgWidth*3/4);
+        RectF rect = new RectF(x - imgWidth *2/ 3, y - imgWidth*2 / 3, x + imgWidth
+                *2/ 3, y + imgWidth*2/3);
 
         Bitmap bitmap = bitmaps.get(i);
 

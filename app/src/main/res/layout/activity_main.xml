@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="78dp"
         android:layout_centerHorizontal="true"
-        luckpan:pannum="6"
+        luckpan:pannum="8"
         luckpan:names="@array/names"
         luckpan:icons="@array/icons"
         />

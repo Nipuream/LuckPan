@@ -7,6 +7,9 @@
         <item>moba</item>
         <item>other</item>
         <item>role</item>
+        <item>sports</item>
+        <item>words</item>
+
     </string-array>
 
     <string-array name="icons">
@@ -16,6 +19,9 @@
         <item>moba</item>
         <item>other</item>
         <item>role</item>
+        <item>sports</item>
+        <item>words</item>
+
     </string-array>
 
 

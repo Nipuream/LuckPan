@@ -40,7 +40,50 @@ Android 抽奖转盘的实现，如下图所示：<br/>
 
 
 <br/>
+##改变转盘个数##
+
+   <com.hr.nipuream.luckpan.view.RotatePan
+        android:id="@+id/rotatePan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="78dp"
+        android:layout_centerHorizontal="true"
+        luckpan:pannum="8"
+        luckpan:names="@array/names"
+        luckpan:icons="@array/icons"
+        />
+
+        将pannum改为你想要的数量，然后names和icons定义在arrays.xml文件中
+
+        <resources>
+            <string-array name="names">
+                <item>action</item>
+                <item>adventure</item>
+                <item>combat</item>
+                <item>moba</item>
+                <item>other</item>
+                <item>role</item>
+                <item>sports</item>
+                <item>words</item>
+            </string-array>
+
+            <string-array name="icons">
+                <item>action</item>
+                <item>adventure</item>
+                <item>combat</item>
+                <item>moba</item>
+                <item>other</item>
+                <item>role</item>
+                <item>sports</item>
+                <item>words</item>
+            </string-array>
+        </resources>
+
+        其中arrays.xml中的数量要和转盘的数量一致
+
+
+<br/>
 ## 更多信息 ##
-[http://blog.csdn.net/yanghuinipurean/article/details/52251107](http://blog.csdn.net/yanghuinipurean/article/details/52251107)
+[http://blog.csdn.net/YanghuiNipurean/article/details/52251107)
 
 
