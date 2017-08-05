@@ -1,19 +1,22 @@
-# 幸运转盘 #
-<br/>
-Android 抽奖转盘的实现，如下图所示：<br/>
-
+# 幸运转盘
 
 <br/>
-## 点击按钮滚动 ##
-![](https://github.com/Nipuream/LuckPan/blob/master/luck_pan.gif)
 
-<br/>
-## 随手势滚动 ##
-![](https://github.com/Nipuream/LuckPan/blob/master/scroll.gif)
+##特性
+
+Android 抽奖转盘基于View的实现，主要有以下几点特性：<br/>
+
+### 点击按钮滚动
+![点击按钮滚动](https://github.com/Nipuream/LuckPan/blob/master/luck_pan.gif)
 
 
-<br/>
-## 滚动到指定区域 ##
+### 随手势滚动
+![随手势滚动](https://github.com/Nipuream/LuckPan/blob/master/scroll.gif)
+
+
+##使用
+
+### 滚动到指定区域
      /**
      * 开始转动
      * @param pos 如果 pos = -1 则随机，如果指定某个值，则转到某个指定区域
@@ -39,9 +42,9 @@ Android 抽奖转盘的实现，如下图所示：<br/>
         }
 
 
-<br/>
-##改变转盘个数##
 
+###改变转盘个数
+~~~
    <com.hr.nipuream.luckpan.view.RotatePan
         android:id="@+id/rotatePan"
         android:layout_width="wrap_content"
@@ -80,10 +83,11 @@ Android 抽奖转盘的实现，如下图所示：<br/>
         </resources>
 
         其中arrays.xml中的数量要和转盘的数量一致
+~~~
 
+详细操作见Demo和更多信息。
 
-<br/>
-## 更多信息 ##
-[http://blog.csdn.net/YanghuiNipurean/article/details/52251107)
+## 更多信息
+[Android 抽奖转盘的实现](http://blog.csdn.net/YanghuiNipurean/article/details/52251107)
 
 

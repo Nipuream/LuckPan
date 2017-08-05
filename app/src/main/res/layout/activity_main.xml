@@ -62,18 +62,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true"
-        />
+        android:background="@android:color/transparent"
+        >
 
-    <com.hr.nipuream.luckpan.view.RotatePan
-        android:id="@+id/rotatePan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="78dp"
-        android:layout_centerHorizontal="true"
-        luckpan:pannum="8"
-        luckpan:names="@array/names"
-        luckpan:icons="@array/icons"
-        />
+        <com.hr.nipuream.luckpan.view.RotatePan
+            android:id="@+id/rotatePan"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            luckpan:pannum="8"
+            luckpan:names="@array/names"
+            luckpan:icons="@array/icons"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:id="@+id/go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/node"
+            android:clickable="true"
+            android:onClick="rotation"
+            android:tag="startbtn"
+            />
+
+
+
+    </com.hr.nipuream.luckpan.view.LuckPanLayout>
+
+
 
     <!--<Button-->
         <!--android:layout_width="wrap_content"-->
@@ -82,16 +98,7 @@
         <!--android:onClick="rotation"-->
         <!--/>-->
 
-    <ImageView
-        android:id="@+id/go"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/node"
-        android:clickable="true"
-        android:onClick="rotation"
-        android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true"
-        />
+
 
 
     <RelativeLayout

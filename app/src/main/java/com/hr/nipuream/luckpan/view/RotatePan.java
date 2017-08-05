@@ -22,7 +22,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import com.hr.nipuream.luckpan.R;
-import com.hr.nipuream.luckpan.Util;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,7 +31,7 @@ import java.util.List;
  * 描述：
  * 作者：Nipuream
  * 时间: 2016-08-16 10:18
- * 邮箱：571829491@qq.com
+ * 邮箱：nipuream@163.com
  */
 public class RotatePan extends View {
 
@@ -55,6 +55,7 @@ public class RotatePan extends View {
     private List<Bitmap> bitmaps = new ArrayList<>();
     private GestureDetectorCompat mDetector;
     private ScrollerCompat scroller;
+    private int screenWidth,screeHeight;
 
     public RotatePan(Context context) {
         this(context,null);
@@ -67,6 +68,8 @@ public class RotatePan extends View {
     public RotatePan(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
+        screeHeight = getResources().getDisplayMetrics().heightPixels;
+        screenWidth = getResources().getDisplayMetrics().widthPixels;
 
         mDetector = new GestureDetectorCompat(context,new RotatePanGestureListener());
         scroller = ScrollerCompat.create(context);
@@ -118,21 +121,26 @@ public class RotatePan extends View {
         // TODO Auto-generated method stub
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         //wrap_content value
-        int mHeight = Util.dip2px(context, 300);
-        int mWidth = Util.dip2px(context, 300);
+//        int mHeight = Util.dip2px(context, 300);
+//        int mWidth = Util.dip2px(context, 300);
+//
+//        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
+//        int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
+//        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
+//        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+//
+//        if(widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST){
+//            setMeasuredDimension(mWidth, mHeight);
+//        }else if(widthSpecMode == MeasureSpec.AT_MOST){
+//            setMeasuredDimension(mWidth, heightSpecSize);
+//        }else if(heightSpecMode == MeasureSpec.AT_MOST){
+//            setMeasuredDimension(widthSpecSize, mHeight);
+//        }
 
-        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-        int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
+        int MinValue = Math.min(screenWidth,screeHeight);
+        MinValue -= Util.dip2px(context,38)*2;
+        setMeasuredDimension(MinValue,MinValue);
 
-        if(widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST){
-            setMeasuredDimension(mWidth, mHeight);
-        }else if(widthSpecMode == MeasureSpec.AT_MOST){
-            setMeasuredDimension(mWidth, heightSpecSize);
-        }else if(heightSpecMode == MeasureSpec.AT_MOST){
-            setMeasuredDimension(widthSpecSize, mHeight);
-        }
     }
 
     @Override
@@ -229,7 +237,7 @@ public class RotatePan extends View {
      * 开始转动
      * @param pos 如果 pos = -1 则随机，如果指定某个值，则转到某个指定区域
      */
-    public void startRotate(int pos){
+    protected void startRotate(int pos){
 
         int lap = (int) (Math.random()*12) + 4;
 
@@ -275,8 +283,12 @@ public class RotatePan extends View {
             @Override
             public void onAnimationEnd(Animator animation) {
                 super.onAnimationEnd(animation);
-                if(l != null)
-                    l.endAnimation(queryPosition());
+                if(((LuckPanLayout)getParent()).getAnimationEndListener()!= null)
+                {
+                    ((LuckPanLayout)getParent()).setStartBtnEnable(true);
+                    ((LuckPanLayout)getParent()).setDelayTime(LuckPanLayout.DEFAULT_TIME_PERIOD);
+                    ((LuckPanLayout)getParent()).getAnimationEndListener().endAnimation(queryPosition());
+                }
             }
         });
         animtor.start();
@@ -299,15 +311,7 @@ public class RotatePan extends View {
     }
 
 
-    public interface AnimationEndListener{
-        void endAnimation(int position);
-    }
 
-    private AnimationEndListener l;
-
-    public void setAnimationEndListener(AnimationEndListener l){
-        this.l = l;
-    }
 
 
     @Override
@@ -325,7 +329,7 @@ public class RotatePan extends View {
         boolean consume = mDetector.onTouchEvent(event);
         if(consume)
         {
-            getParent().requestDisallowInterceptTouchEvent(true);
+            getParent().getParent().requestDisallowInterceptTouchEvent(true);
             return true;
         }
 

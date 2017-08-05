@@ -1,4 +1,4 @@
-package com.hr.nipuream.luckpan;
+package com.hr.nipuream.luckpan.view;
 
 import android.content.Context;
 
@@ -6,7 +6,7 @@ import android.content.Context;
  * 描述：
  * 作者：Nipuream
  * 时间: 2016-08-15 19:36
- * 邮箱：571829491@qq.com
+ * 邮箱：nipuream@163.com
  */
 public class Util {
 
