@@ -192,7 +192,8 @@ public class RotatePan extends View {
         float textWidth = mTextPaint.measureText(string);
 
         //圆弧的水平偏移
-        float hOffset = (float) (mRadius * Math.PI / 6 / 2 - textWidth / 2);
+        float hOffset  = (panNum % 4 == 0)?((float) (mRadius * Math.PI / panNum/2 ))
+                :((float) (mRadius * Math.PI / panNum/2 - textWidth/2 ));
         //圆弧的垂直偏移
         float vOffset = mRadius / 2 / 6;
         mCanvas.drawTextOnPath(string, path, hOffset, vOffset, mTextPaint);
@@ -239,8 +240,10 @@ public class RotatePan extends View {
      */
     protected void startRotate(int pos){
 
+        //Rotate lap.
         int lap = (int) (Math.random()*12) + 4;
 
+        //Rotate angle.
         int angle = 0;
         if(pos < 0){
             angle = (int) (Math.random() * 360);
@@ -257,7 +260,7 @@ public class RotatePan extends View {
             }
         }
 
-
+        //All of the rotate angle.
         int increaseDegree = lap * 360 + angle;
         long time = (lap + angle / 360) * ONE_WHEEL_TIME;
         int DesRotate = increaseDegree + InitAngle;
@@ -298,6 +301,7 @@ public class RotatePan extends View {
     private int queryPosition(){
         InitAngle = (InitAngle % 360 + 360) % 360;
         int pos = InitAngle / verPanRadius;
+        if(panNum == 4) pos ++;
         return calcumAngle(pos);
     }
 

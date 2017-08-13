@@ -2,7 +2,7 @@
 
 <br/>
 
-##特性
+## 特性
 
 Android 抽奖转盘基于View的实现，主要有以下几点特性：<br/>
 
@@ -14,7 +14,7 @@ Android 抽奖转盘基于View的实现，主要有以下几点特性：<br/>
 ![随手势滚动](https://github.com/Nipuream/LuckPan/blob/master/scroll.gif)
 
 
-##使用
+## 使用
 
 ### 滚动到指定区域
      /**
