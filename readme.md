@@ -17,34 +17,36 @@ Android 抽奖转盘基于View的实现，主要有以下几点特性：<br/>
 ## 使用
 
 ### 滚动到指定区域
-     /**
-     * 开始转动
-     * @param pos 如果 pos = -1 则随机，如果指定某个值，则转到某个指定区域
-     */
-    public void startRotate(int pos){
+```java
+ /**
+ * 开始转动
+ * @param pos 如果 pos = -1 则随机，如果指定某个值，则转到某个指定区域
+ */
+public void startRotate(int pos){
 
-        int lap = (int) (Math.random()*12) + 4;
+    int lap = (int) (Math.random()*12) + 4;
 
-        int angle = 0;
-        if(pos < 0){
-            angle = (int) (Math.random() * 360);
+    int angle = 0;
+    if(pos < 0){
+        angle = (int) (Math.random() * 360);
+    }else{
+        int initPos  = queryPosition();
+        if(pos > initPos){
+            angle = (pos - initPos)*60;
+            lap -= 1;
+            angle = 360 - angle;
+        }else if(pos < initPos){
+            angle = (initPos - pos)*60;
         }else{
-            int initPos  = queryPosition();
-            if(pos > initPos){
-                angle = (pos - initPos)*60;
-                lap -= 1;
-                angle = 360 - angle;
-            }else if(pos < initPos){
-                angle = (initPos - pos)*60;
-            }else{
-                //nothing to do.
-            }
+            //nothing to do.
         }
+    }
+```
 
 
 
-###改变转盘个数
-~~~
+### 改变转盘个数
+~~~xml
    <com.hr.nipuream.luckpan.view.RotatePan
         android:id="@+id/rotatePan"
         android:layout_width="wrap_content"
@@ -85,7 +87,7 @@ Android 抽奖转盘基于View的实现，主要有以下几点特性：<br/>
         其中arrays.xml中的数量要和转盘的数量一致
 ~~~
 
-详细操作见Demo和更多信息。
+经过实践和反馈，最多使用的转盘数为6、8，所以对这两种情况进行了兼容，其他数量的转盘可能会有些小问题，详细操作见Demo和更多信息。
 
 ## 更多信息
 [Android 抽奖转盘的实现](http://blog.csdn.net/YanghuiNipurean/article/details/52251107)

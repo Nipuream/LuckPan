@@ -22,7 +22,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import com.hr.nipuream.luckpan.R;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -188,6 +187,7 @@ public class RotatePan extends View {
     private void drawText(float startAngle, String string,int mRadius,Paint mTextPaint,Canvas mCanvas,RectF mRange)
     {
         Path path = new Path();
+
         path.addArc(mRange, startAngle, verPanRadius);
         float textWidth = mTextPaint.measureText(string);
 
@@ -196,6 +196,7 @@ public class RotatePan extends View {
                 :((float) (mRadius * Math.PI / panNum/2 - textWidth/2 ));
         //圆弧的垂直偏移
         float vOffset = mRadius / 2 / 6;
+
         mCanvas.drawTextOnPath(string, path, hOffset, vOffset, mTextPaint);
     }
 
