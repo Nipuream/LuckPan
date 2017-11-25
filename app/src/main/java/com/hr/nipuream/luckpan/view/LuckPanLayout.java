@@ -6,10 +6,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.text.TextUtils;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+
+import com.hr.nipuream.luckpan.util.Logger;
+import com.hr.nipuream.luckpan.util.Util;
 
 /**
  * 描述：
@@ -20,7 +22,6 @@ import android.widget.RelativeLayout;
 public class LuckPanLayout extends RelativeLayout {
 
     private Context context;
-    private static final String TAG = "LuckPanLayout";
     private Paint backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint whitePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private Paint yellowPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -34,6 +35,9 @@ public class LuckPanLayout extends RelativeLayout {
 
     private int screenWidth,screeHeight;
     private int MinValue;
+    /**
+     * LuckPan 中间对应的Button必须设置tag为 startbtn.
+     */
     private static final String START_BTN_TAG = "startbtn";
     public static final int DEFAULT_TIME_PERIOD = 500;
 
@@ -49,17 +53,13 @@ public class LuckPanLayout extends RelativeLayout {
     public LuckPanLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
+        Logger.setDebug(true);
         backgroundPaint.setColor(Color.rgb(255,92,93));
         whitePaint.setColor(Color.WHITE);
         yellowPaint.setColor(Color.YELLOW);
         screeHeight = getResources().getDisplayMetrics().heightPixels;
         screenWidth = getResources().getDisplayMetrics().widthPixels;
-        post(new Runnable() {
-            @Override
-            public void run() {
-                startLuckLight();
-            }
-        });
+        startLuckLight();
     }
 
 
@@ -67,22 +67,9 @@ public class LuckPanLayout extends RelativeLayout {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-//        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-//        int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-//        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-//        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
-//
-//        if(widthSpecMode == MeasureSpec.AT_MOST  && heightSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(200, 200);
-//        }else if(widthSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(200, heightSpecSize);
-//        }else if(heightSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(widthSpecSize, 200);
-//        }
-
         MinValue = Math.min(screenWidth,screeHeight);
         MinValue -= Util.dip2px(context,10)*2;
-        Log.d(TAG,"screenWidth = "+screenWidth + "screenHeight = "+screeHeight + "MinValue = "+MinValue);
+        Logger.getLogger().d("screenWidth = "+screenWidth + "screenHeight = "+screeHeight + "MinValue = "+MinValue);
         setMeasuredDimension(MinValue,MinValue);
     }
 
@@ -181,6 +168,7 @@ public class LuckPanLayout extends RelativeLayout {
             }
         },delayTime);
     }
+
 
     protected void setDelayTime(int delayTime){
         this.delayTime = delayTime;

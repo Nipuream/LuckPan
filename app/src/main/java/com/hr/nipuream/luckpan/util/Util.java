@@ -1,4 +1,4 @@
-package com.hr.nipuream.luckpan.view;
+package com.hr.nipuream.luckpan.util;
 
 import android.content.Context;
 

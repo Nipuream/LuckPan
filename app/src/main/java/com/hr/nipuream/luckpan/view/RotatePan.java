@@ -22,6 +22,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import com.hr.nipuream.luckpan.R;
+import com.hr.nipuream.luckpan.util.Logger;
+import com.hr.nipuream.luckpan.util.Util;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -45,16 +47,16 @@ public class RotatePan extends View {
     private int radius = 0;
     private int verPanRadius ;
     private int diffRadius ;
-
     public static final int FLING_VELOCITY_DOWNSCALE = 4;
-
     private Integer[] images ;
     private String[] strs ;
-
     private List<Bitmap> bitmaps = new ArrayList<>();
     private GestureDetectorCompat mDetector;
     private ScrollerCompat scroller;
     private int screenWidth,screeHeight;
+
+    //旋转一圈所需要的时间
+    private static final long ONE_WHEEL_TIME = 500;
 
     public RotatePan(Context context) {
         this(context,null);
@@ -90,6 +92,7 @@ public class RotatePan extends View {
     }
 
     private void checkPanState(Context context,AttributeSet attrs){
+        Logger.getLogger().d("start load luckpan resources ...");
         TypedArray typedArray = context.obtainStyledAttributes(attrs,R.styleable.luckpan);
         panNum = typedArray.getInteger(R.styleable.luckpan_pannum,0);
         if(360 % panNum != 0)
@@ -107,39 +110,23 @@ public class RotatePan extends View {
         }
 
         images = iconLists.toArray(new Integer[iconLists.size()]);
-        Log.d("images", Arrays.toString(images));
+        Logger.getLogger().d(Arrays.toString(images));
         typedArray.recycle();
         if(strs == null || images == null)
             throw new RuntimeException("Can't find string or icon resources.");
         if(strs.length != panNum || images.length != panNum)
             throw new RuntimeException("The string length or icon length  isn't equals panNum.");
+        Logger.getLogger().d("load luckpan resources successfully -_- ~");
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         // TODO Auto-generated method stub
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        //wrap_content value
-//        int mHeight = Util.dip2px(context, 300);
-//        int mWidth = Util.dip2px(context, 300);
-//
-//        int widthSpecMode = MeasureSpec.getMode(widthMeasureSpec);
-//        int widthSpecSize = MeasureSpec.getSize(widthMeasureSpec);
-//        int heightSpecMode = MeasureSpec.getMode(heightMeasureSpec);
-//        int heightSpecSize = MeasureSpec.getSize(heightMeasureSpec);
-//
-//        if(widthSpecMode == MeasureSpec.AT_MOST && heightSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(mWidth, mHeight);
-//        }else if(widthSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(mWidth, heightSpecSize);
-//        }else if(heightSpecMode == MeasureSpec.AT_MOST){
-//            setMeasuredDimension(widthSpecSize, mHeight);
-//        }
 
         int MinValue = Math.min(screenWidth,screeHeight);
         MinValue -= Util.dip2px(context,38)*2;
         setMeasuredDimension(MinValue,MinValue);
-
     }
 
     @Override
@@ -161,7 +148,7 @@ public class RotatePan extends View {
         RectF rectF = new RectF(getPaddingLeft(),getPaddingTop(),width,height);
 
         int angle = (panNum%4 ==0) ? InitAngle : InitAngle-diffRadius;
-        Log.d("angle",String.valueOf(angle));
+        Logger.getLogger().d(String.valueOf(angle));
 
         for(int i= 0;i<panNum;i++){
             if(i%2 == 0){
@@ -231,8 +218,6 @@ public class RotatePan extends View {
         this.invalidate();
     }
 
-    //旋转一圈所需要的时间
-    private static final long ONE_WHEEL_TIME = 500;
 
 
     /**
@@ -317,12 +302,13 @@ public class RotatePan extends View {
 
 
 
-
-
     @Override
     protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
         clearAnimation();
+        if(getParent() instanceof LuckPanLayout){
+            ((LuckPanLayout) getParent()).getHandler().removeCallbacksAndMessages(null);
+        }
+        super.onDetachedFromWindow();
     }
 
 
